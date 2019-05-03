@@ -13,7 +13,7 @@ controls.maxDistance = 200;
 var geometryPelota, materialPelota, geometryPiso, materialPiso, piso, pelotas = [], totalPelotas = 3, GameOver = false, PhMesh, PhFric, PhRes, turningFlips = [];
 materialPelota = new THREE.MeshPhongMaterial({ color: 0xffffff, emissive: 0x444444, specular: 0x555555, shininess: 200 });
 geometryPelota = new THREE.SphereGeometry(2.25, 12, 12);
-var rPad, lPad, rPadUp = false, lPadUp = false, rPadPos = new THREE.Vector3(19.9, 3.75, 72), lPadPos = new THREE.Vector3(-19.9, 3.75, 72),
+var rPad, lPad,geometryRPad,geometryLPad,materialRPad,materialLPad, rPadUp = false, lPadUp = false, rPadPos = new THREE.Vector3(19.9, 3.75, 72), lPadPos = new THREE.Vector3(-19.9, 3.75, 72),
     rPadRot = new THREE.Vector3(0, 0.5236, 0), lPadRot = new THREE.Vector3(0, -0.5236, 0);//+-30 * Math.PI/180
 var vy = 0, vx = 0, gravity = 0.3;
 
@@ -128,28 +128,30 @@ function crearTablero() {
     scene.add( meshTecho ); 
     */
     // ------------------------------------- Paddles -----------------------------------
-    Shp = new THREE.Shape();
-    Shp.moveTo(-15, -1.5);
-    Shp.lineTo(0, -3);
-    Shp.bezierCurveTo(4.5, -3, 4.5, 3, 0, 3);
-    Shp.lineTo(-15, 1.5);
-    Shp.bezierCurveTo(-17, 0.75, -17, -0.75, -15, -1.5); // close
+    shape = new THREE.Shape();
+    shape.moveTo(-15, -1.5);
+    shape.lineTo(0, -3);
+    shape.bezierCurveTo(4.5, -3, 4.5, 3, 0, 3);
+    shape.lineTo(-15, 1.5);
+    shape.bezierCurveTo(-17, 0.75, -17, -0.75, -15, -1.5); // close
+    var extrudeSettings = {
+        depth: 3.5, bevelEnabled: false, bevelSegments: 1, bevelSize: 0.25, bevelThickness: 0.25, curveSegments: 6
+    };
 
-
-    // Paddle right
-    Geo = Shp.extrude({ amount: 3.5, bevelEnabled: false, bevelSegments: 1, bevelSize: 0.25, bevelThickness: 0.25, curveSegments: 6 });
-    Geo.applyMatrix(new THREE.Matrix4().makeRotationX(-90 * Math.PI / 180));
-    Mat = Physijs.createMaterial(new THREE.MeshPhongMaterial({ color: 0xcccccc, specular: 0x999999, shininess: 175 }), 0.4, 0.8);
-    rPad = new Physijs.ConvexMesh(Geo, Mat, 10000000);
+    // Palanca derecha
+    geometryRPad = new THREE.ExtrudeGeometry(shape, extrudeSettings);
+    geometryRPad.applyMatrix(new THREE.Matrix4().makeRotationX(-90 * Math.PI / 180));
+    materialRPad = new THREE.MeshPhongMaterial({ color: 0xcccccc, specular: 0x999999, shininess: 175 });
+    rPad = new THREE.Mesh(geometryRPad, materialRPad);
     rPad.rotation.set(rPadRot.x, rPadRot.y, rPadRot.z);
     rPad.position.set(rPadPos.x, rPadPos.y, rPadPos.z);
     scene.add(rPad);
 
-    // Paddle left
-    Geo = Geo.clone();
-    Geo.applyMatrix(new THREE.Matrix4().makeRotationY(180 * Math.PI / 180));
-    Mat = Physijs.createMaterial(new THREE.MeshPhongMaterial({ color: 0xeeeeee, specular: 0x1c1c1c, shininess: 200 }), 0.4, 0.8);
-    lPad = new Physijs.ConvexMesh(Geo, Mat, 10000000);
+    // Palanca izquierda
+    geometryLPad = geometryRPad.clone();
+    geometryLPad.applyMatrix(new THREE.Matrix4().makeRotationY(180 * Math.PI / 180));
+    materialLPad = new THREE.MeshPhongMaterial({ color: 0xeeeeee, specular: 0x1c1c1c, shininess: 200 });
+    lPad = new THREE.Mesh(geometryLPad, materialLPad);
     lPad.rotation.set(lPadRot.x, lPadRot.y, lPadRot.z);
     lPad.position.set(lPadPos.x, lPadPos.y, lPadPos.z);
     scene.add(lPad);
